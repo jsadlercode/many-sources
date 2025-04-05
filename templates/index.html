@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Aggregator MVP</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
+        h1, h2, h3 { margin-bottom: 0.5em; }
+        form { margin-bottom: 20px; }
+        label { margin-right: 10px; }
+        input[type="text"] { padding: 8px; min-width: 300px; }
+        button { padding: 8px 15px; }
+        .source-results { margin-bottom: 20px; border: 1px solid #eee; padding: 15px; border-radius: 5px;}
+        .source-results h3 { margin-top: 0; }
+        ul { list-style: none; padding-left: 0; }
+        li { margin-bottom: 15px; }
+        li a { font-weight: bold; text-decoration: none; color: #0056b3; }
+        li a:hover { text-decoration: underline; }
+        li p { margin: 5px 0 0 0; font-size: 0.9em; color: #555; }
+        .no-results { color: #777; }
+    </style>
+</head>
+<body>
+
+    <h1>News Topic Aggregator (MVP)</h1>
+
+    <form method="POST">
+        <label for="keywords">Enter Topic Keywords:</label>
+        <input type="text" id="keywords" name="keywords" value="{{ keywords or '' }}" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if search_attempted %}
+        <h2>Results for "{{ keywords }}"</h2>
+
+        {% if results %}
+            {% set found_any = false %}
+            {% for source_name, articles in results.items() %}
+                {% if articles %}
+                    {% set found_any = true %}
+                    <div class="source-results">
+                        <h3>{{ source_name }}</h3>
+                        <ul>
+                            {% for article in articles %}
+                            <li>
+                                <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer">{{ article.title }}</a>
+                                <p>{{ article.summary }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if not found_any %}
+                 <p class="no-results">No articles found matching your keywords from the configured sources.</p>
+            {% endif %}
+        {% else %}
+             <p class="no-results">Could not fetch results. Check logs or feed URLs.</p> {# Added more specific message #}
+        {% endif %}
+    {% endif %}
+
+</body>
+</html>
